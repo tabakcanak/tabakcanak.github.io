@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="tr">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -188,142 +189,132 @@
 
 <body>
 
-<main>
+    <main>
 
-    <div class="toolbar">
-        <button
-            id="theme"
-            class="theme"
-            type="button">
-            ☀ Light
-        </button>
-    </div>
+        <div class="toolbar">
+            <button id="theme" class="theme" type="button">
+                ☀ Light
+            </button>
+        </div>
 
-    <div class="layout">
+        <div class="layout">
 
-        <section>
-            <div class="player">
-                <video
-                    id="video"
-                    controls
-                    playsinline
-                    preload="metadata">
-                </video>
-            </div>
+            <section>
+                <div class="player">
+                    <video id="video" controls playsinline preload="metadata">
+                    </video>
+                </div>
 
-            <div
-                id="currentTitle"
-                class="title">
-                
-            </div>
-        </section>
+                <div id="currentTitle" class="title">
 
-        <aside
-            id="list"
-            class="list">
-            <div class="status">
-                Yükleniyor...
-            </div>
-        </aside>
+                </div>
+            </section>
 
-    </div>
+            <aside id="list" class="list">
+                <div class="status">
+                    Yükleniyor...
+                </div>
+            </aside>
 
-</main>
+        </div>
 
-<script>
-    const JSON_URL = "https://raw.githubusercontent.com/tabakcanak/data1/refs/heads/main/data1/data1.json";
+    </main>
 
-    const root = document.documentElement;
-    const video = document.getElementById("video");
-    const list = document.getElementById("list");
-    const currentTitle = document.getElementById("currentTitle");
-    const theme = document.getElementById("theme");
+    <script>
+        const JSON_URL = "https://raw.githubusercontent.com/tabakcanak/data1/refs/heads/main/data1/data1.json";
 
-    const savedTheme = localStorage.getItem("video-theme");
+        const root = document.documentElement;
+        const video = document.getElementById("video");
+        const list = document.getElementById("list");
+        const currentTitle = document.getElementById("currentTitle");
+        const theme = document.getElementById("theme");
 
-    if (savedTheme === "light") {
-        root.classList.add("light");
-        root.style.colorScheme = "light";
-        theme.textContent = "☾ Dark";
-    }
+        const savedTheme = localStorage.getItem("video-theme");
 
-    theme.addEventListener("click", () => {
-        const light = root.classList.toggle("light");
+        if (savedTheme === "light") {
+            root.classList.add("light");
+            root.style.colorScheme = "light";
+            theme.textContent = "☾ Dark";
+        }
 
-        root.style.colorScheme = light ? "light" : "dark";
+        theme.addEventListener("click", () => {
+            const light = root.classList.toggle("light");
 
-        theme.textContent = light
-            ? "☾ Dark"
-            : "☀ Light";
+            root.style.colorScheme = light ? "light" : "dark";
 
-        localStorage.setItem(
-            "video-theme",
-            light ? "light" : "dark"
-        );
-    });
+            theme.textContent = light
+                ? "☾ Dark"
+                : "☀ Light";
 
-    fetch(JSON_URL)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error();
-            }
-
-            return response.json();
-        })
-        .then(videos => {
-            if (!Array.isArray(videos)) {
-                throw new Error();
-            }
-
-            list.innerHTML = "";
-
-            const validVideos = videos.filter(
-                item => item && item.url
+            localStorage.setItem(
+                "video-theme",
+                light ? "light" : "dark"
             );
+        });
 
-            if (!validVideos.length) {
-                list.innerHTML =
-                    '<div class="status">yok</div>';
-                return;
-            }
+        fetch(JSON_URL)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error();
+                }
 
-            validVideos.forEach((item, index) => {
-                const button = document.createElement("button");
+                return response.json();
+            })
+            .then(videos => {
+                if (!Array.isArray(videos)) {
+                    throw new Error();
+                }
 
-                button.type = "button";
-                button.className = "item";
-                button.textContent =
-                    item.name || "Video " + (index + 1);
+                list.innerHTML = "";
 
-                button.addEventListener("click", () => {
-                    list
-                        .querySelectorAll(".item")
-                        .forEach(element => {
-                            element.classList.remove("active");
-                        });
+                const validVideos = videos.filter(
+                    item => item && item.url && item.isActive === true
+                );
 
-                    button.classList.add("active");
+                if (!validVideos.length) {
+                    list.innerHTML =
+                        '<div class="status">yok</div>';
+                    return;
+                }
 
-                    video.src = item.url;
-                    currentTitle.textContent =
+                validVideos.forEach((item, index) => {
+                    const button = document.createElement("button");
+
+                    button.type = "button";
+                    button.className = "item";
+                    button.textContent =
                         item.name || "Video " + (index + 1);
 
-                    video.load();
-                    video.play().catch(() => {});
+                    button.addEventListener("click", () => {
+                        list
+                            .querySelectorAll(".item")
+                            .forEach(element => {
+                                element.classList.remove("active");
+                            });
+
+                        button.classList.add("active");
+
+                        video.src = item.url;
+                        currentTitle.textContent =
+                            item.name || "Video " + (index + 1);
+
+                        video.load();
+                        video.play().catch(() => { });
+                    });
+
+                    list.appendChild(button);
+
+                    if (index === 0) {
+                        button.click();
+                    }
                 });
-
-                list.appendChild(button);
-
-                if (index === 0) {
-                    button.click();
-                }
+            })
+            .catch(() => {
+                list.innerHTML =
+                    '<div class="status error">yok</div>';
             });
-        })
-        .catch(() => {
-            list.innerHTML =
-                '<div class="status error">yok</div>';
-        });
-</script>
+    </script>
 
 </body>
+
 </html>
