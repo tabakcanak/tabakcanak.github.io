@@ -826,9 +826,25 @@
 
                     const data = await response.json();
                     const result = data && data.data ? data.data : {};
+
                     const values = Object.values(result.schemaStatus);
-                    const changedCount = values.filter(value => value === "D").length;
-                    const otherCount = values.filter(value => ["L", "H", "B", "E", "Ç"].includes(value)).length;
+                    let changedCount = 0;
+                    let otherCount = 0;
+
+                    values.forEach(value => {
+                        if (!value || value === "1") return;
+
+                        const statuses = value.split(",");
+                        statuses.forEach(status => {
+                            status = status.trim();
+
+                            if (status === "D") {
+                                changedCount++;
+                            } else if (["L", "H", "B", "E", "Ç"].includes(status)) {
+                                otherCount++;
+                            }
+                        });
+                    });
 
                     expertiseElement.textContent = "";
                     for (let i = 0; i < changedCount; i++) {
@@ -837,7 +853,7 @@
                     for (let i = 0; i < otherCount; i++) {
                         expertiseElement.innerHTML += `<span style="color:#d9c477; font-size:18px;">●</span>`;
                     }
-                    if (changedCount == 0 && otherCount == 0) {
+                    if (changedCount === 0 && otherCount === 0) {
                         expertiseElement.innerHTML += `<span style="color:#91C9A5; font-size:18px;">●</span>`;
                     }
                 }
