@@ -1189,6 +1189,13 @@
         /* ==========================================
            DATE
         ========================================== */
+        function formatDateCustom(value) {
+            const date = new Date(value);
+
+            const pad = (num) => String(num).padStart(2, '0');
+
+            return `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+        }
 
         function date(value) {
 
@@ -1713,8 +1720,8 @@
 
             const published =
                 esc(
-                    car.internetPublishDateString ||
-                    date(car.internetPublishDate)
+                    //car.internetPublishDateString || date(car.internetPublishDate)
+                    formatDateCustom(car.internetPublishDate)
                 );
 
 
